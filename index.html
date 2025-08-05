@@ -91,7 +91,105 @@
             color: var(--text-secondary);
             font-size: 1.1rem;
             max-width: 600px;
-            margin: 0 auto;
+            margin: 0 auto 20px auto;
+        }
+
+        .github-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .github-link:hover {
+            background: var(--surface-light);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .github-link i {
+            font-size: 1.2rem;
+        }
+
+        .developer-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .developer-info strong {
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding: 25px 0;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-credit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-credit strong {
+            color: var(--text-primary);
+        }
+
+        .footer-separator {
+            opacity: 0.5;
         }
 
         /* Settings Panel */
@@ -410,6 +508,20 @@
                 font-size: 2rem;
             }
 
+            .github-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .footer-links {
+                gap: 15px;
+            }
+
+            .footer-credit {
+                text-align: center;
+                gap: 5px;
+            }
+
             .settings-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
@@ -471,6 +583,15 @@
         <header class="header">
             <h1><i class="fas fa-robot"></i> Portal Claude</h1>
             <p>Converse com a IA mais avançada do mundo. Simples, rápido e seguro.</p>
+            <div class="github-info">
+                <a href="https://github.com/luizfspb/portal-claude" target="_blank" class="github-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+                <span class="developer-info">
+                    Desenvolvido por <strong>Luiz Filipe</strong>
+                </span>
+            </div>
         </header>
 
         <div class="settings-panel">
@@ -496,7 +617,7 @@
                     <h3>Bem-vindo ao Portal Claude!</h3>
                     <p>Digite sua mensagem abaixo para começar a conversar.</p>
                     <p><small>Você pode arrastar arquivos de código para anexá-los à sua mensagem.</small></p>
-                    <p><small><strong>Suporte completo para .NET MAUI:</strong> C#, XAML, projetos, soluções e mais!</small></p>
+                    <p><small><strong>Suporte completo para:</strong> C#, XAML, projetos, soluções e mais!</small></p>
                     <div style="margin-top: 15px; padding: 12px; background: var(--surface-light); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
                         <i class="fas fa-lightbulb" style="color: var(--accent-color); margin-right: 5px;"></i>
                         <strong>Limite de 50.000 caracteres:</strong> Otimizamos para performance e custo. 
@@ -542,6 +663,30 @@
                 </div>
             </div>
         </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://github.com/luizfspb/portal-claude" target="_blank">
+                        <i class="fab fa-github"></i>
+                        Código Fonte
+                    </a>
+                    <a href="https://github.com/luizfspb/portal-claude/issues" target="_blank">
+                        <i class="fas fa-bug"></i>
+                        Reportar Bug
+                    </a>
+                    <a href="https://console.anthropic.com/" target="_blank">
+                        <i class="fas fa-key"></i>
+                        Obter API Key
+                    </a>
+                </div>
+                <div class="footer-credit">
+                    <span>Desenvolvido com ☕ por <strong>Luiz Filipe</strong></span>
+                    <span class="footer-separator">•</span>
+                    <span>Powered by <strong>Claude AI</strong></span>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
