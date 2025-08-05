@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat com Claude via API</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+        #chat-container { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; margin-bottom: 10px; }
+        .message { margin-bottom: 10px; }
+        .user-message { color: blue; }
+        .claude-message { color: green; }
+        form { display: flex; flex-direction: column; }
+        input, textarea, button { margin-bottom: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Chat com Claude 3 Sonnet</h1>
+    <div id="chat-container"></div>
+    
+    <label for="apiKey">Sua API Key do Claude:</label>
+    <input type="password" id="apiKey" placeholder="Cole sua API Key aqui">
+
+    <form id="chat-form">
+        <label for="prompt">Sua mensagem:</label>
+        <textarea id="prompt" placeholder="Digite sua pergunta ou pedido..."></textarea>
+        
+        <label for="fileUpload">Anexar Script C#:</label>
+        <input type="file" id="fileUpload" accept=".cs">
+
+        <label for="maxTokens">Tokens Máximos de Resposta (Max: 4096):</label>
+        <input type="number" id="maxTokens" value="4096" min="1" max="4096">
+        
+        <button type="submit">Enviar</button>
+    </form>
+    
+    <p>Custo Estimado da Próxima Mensagem: <span id="estimated-cost">...</span></p>
+
+    <script src="script.js"></script>
+</body>
+</html>
