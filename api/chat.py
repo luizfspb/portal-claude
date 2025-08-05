@@ -21,16 +21,8 @@ def count_tokens(text):
 # Rota para a página inicial (index.html)
 @app.route('/')
 def home():
-    # Caminho absoluto para a pasta 'static'
-    static_folder = os.path.join(os.path.dirname(__file__), '..', 'static')
-    return send_from_directory(static_folder, 'index.html')
-
-# Rota para servir os arquivos estáticos (como script.js)
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    # Caminho absoluto para a pasta 'static'
-    static_folder = os.path.join(os.path.dirname(__file__), '..', 'static')
-    return send_from_directory(static_folder, filename)
+    # Serve o index.html da raiz do projeto
+    return send_from_directory('.', 'index.html')
 
 @app.route('/api/chat', methods=['POST'])
 def chat():

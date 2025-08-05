@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Claude - Converse com IA</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06d6a0;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --surface-light: #25293c;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: #374151;
+            --error: #ef4444;
+            --success: #10b981;
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(6, 214, 160, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3)); }
+            to { filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5)); }
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            min-height: 400px;
+            max-height: 600px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--surface-light);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-bot {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 16px 20px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message-user .message-content {
+            background: var(--gradient);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message-bot .message-content {
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border-bottom-left-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        /* Input Area */
+        .input-area {
+            border-top: 1px solid var(--border);
+            padding: 20px 25px;
+            background: var(--surface-light);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--accent-color);
+            background: rgba(6, 214, 160, 0.05);
+            color: var(--accent-color);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .textarea-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 16px 20px 40px 20px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            resize: none;
+            min-height: 60px;
+            max-height: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: help;
+        }
+
+        .char-counter.warning {
+            color: #f59e0b;
+        }
+
+        .char-counter.danger {
+            color: var(--error);
+        }
+
+        .char-info {
+            opacity: 0.6;
+            font-size: 0.7rem;
+            pointer-events: auto;
+        }
+
+        .char-info:hover {
+            opacity: 1;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .send-btn {
+            padding: 16px 20px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Cost Info */
+        .cost-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .welcome-message i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .input-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .textarea-container {
+                width: 100%;
+            }
+
+            .send-btn {
+                width: 100%;
+            }
+            
+            .message-input {
+                max-height: 150px;
+            }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-robot"></i> Portal Claude</h1>
+            <p>Converse com a IA mais avançada do mundo. Simples, rápido e seguro.</p>
+        </header>
+
+        <div class="settings-panel">
+            <div class="settings-grid">
+                <div class="input-group">
+                    <label for="api-key"><i class="fas fa-key"></i> API Key</label>
+                    <input type="password" id="api-key" class="input-field" placeholder="Sua chave da API Anthropic">
+                </div>
+                <div class="input-group">
+                    <label for="max-tokens"><i class="fas fa-sliders-h"></i> Max Tokens</label>
+                    <input type="number" id="max-tokens" class="input-field" value="1024" min="1" max="4096">
+                </div>
+                <button class="btn btn-primary" id="save-settings">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <i class="fas fa-comments"></i>
+                    <h3>Bem-vindo ao Portal Claude!</h3>
+                    <p>Digite sua mensagem abaixo para começar a conversar.</p>
+                    <p><small>Você pode arrastar arquivos de texto para anexá-los à sua mensagem.</small></p>
+                    <div style="margin-top: 15px; padding: 12px; background: var(--surface-light); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                        <i class="fas fa-lightbulb" style="color: var(--accent-color); margin-right: 5px;"></i>
+                        <strong>Limite de 50.000 caracteres:</strong> Otimizamos para performance e custo. 
+                        Claude suporta textos maiores, mas mensagens longas aumentam significativamente o tempo de resposta e custo por token.
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="drop-zone" id="drop-zone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Arraste arquivos aqui ou clique para selecionar</span>
+                    <input type="file" id="file-input" style="display: none;" accept=".txt,.md,.js,.py,.html,.css,.json">
+                </div>
+
+                <div class="input-container">
+                    <div class="textarea-container">
+                        <textarea 
+                            id="message-input" 
+                            class="message-input" 
+                            placeholder="Digite sua mensagem... (Shift + Enter para nova linha)"
+                            rows="2"
+                            maxlength="50000"
+                        ></textarea>
+                        <div class="char-counter" title="Limite para otimizar performance e custo. Claude suporta até ~150k caracteres, mas textos muito longos aumentam significativamente o custo e tempo de resposta.">
+                            <span id="char-count">0</span>/50,000
+                            <i class="fas fa-info-circle char-info"></i>
+                        </div>
+                    </div>
+                    <button class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <span>Claude está pensando...</span>
+                </div>
+
+                <div class="cost-info">
+                    <span><i class="fas fa-calculator"></i> Custo estimado: <strong id="cost-display">$0.0000</strong></span>
+                    <span><i class="fas fa-coins"></i> Tokens: <span id="token-display">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ClaudePortal {
+            constructor() {
+                this.apiKey = localStorage.getItem('claude-api-key') || '';
+                this.fileContent = '';
+                this.fileName = '';
+                this.isLoading = false;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.loadSettings();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    apiKey: document.getElementById('api-key'),
+                    maxTokens: document.getElementById('max-tokens'),
+                    saveSettings: document.getElementById('save-settings'),
+                    chatMessages: document.getElementById('chat-messages'),
+                    messageInput: document.getElementById('message-input'),
+                    sendBtn: document.getElementById('send-btn'),
+                    dropZone: document.getElementById('drop-zone'),
+                    fileInput: document.getElementById('file-input'),
+                    loading: document.getElementById('loading'),
+                    costDisplay: document.getElementById('cost-display'),
+                    tokenDisplay: document.getElementById('token-display'),
+                    charCount: document.getElementById('char-count')
+                };
+            }
+
+            bindEvents() {
+                // Settings
+                this.elements.saveSettings.addEventListener('click', () => this.saveSettings());
+                
+                // File handling
+                this.elements.dropZone.addEventListener('click', () => this.elements.fileInput.click());
+                this.elements.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Drag and drop
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    this.elements.dropZone.addEventListener(eventName, this.preventDefaults, false);
+                });
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    this.elements.dropZone.addEventListener(eventName, () => {
+                        this.elements.dropZone.classList.add('dragover');
+                    }, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    this.elements.dropZone.addEventListener(eventName, () => {
+                        this.elements.dropZone.classList.remove('dragover');
+                    }, false);
+                });
+                
+                this.elements.dropZone.addEventListener('drop', (e) => this.handleDrop(e), false);
+                
+                // Message sending
+                this.elements.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.elements.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                // Auto-resize textarea and update character count
+                this.elements.messageInput.addEventListener('input', () => {
+                    // Auto-resize
+                    this.elements.messageInput.style.height = 'auto';
+                    this.elements.messageInput.style.height = Math.min(this.elements.messageInput.scrollHeight, 200) + 'px';
+                    
+                    // Update character count
+                    this.updateCharacterCount();
+                });
+            }
+
+            loadSettings() {
+                if (this.apiKey) {
+                    this.elements.apiKey.value = this.apiKey;
+                }
+                // Initialize character counter
+                this.updateCharacterCount();
+            }
+
+            saveSettings() {
+                this.apiKey = this.elements.apiKey.value.trim();
+                localStorage.setItem('claude-api-key', this.apiKey);
+                this.showNotification('Configurações salvas com sucesso!', 'success');
+            }
+
+            preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    this.processFile(file);
+                }
+            }
+
+            handleDrop(e) {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.processFile(files[0]);
+                }
+            }
+
+            processFile(file) {
+                if (file.size > 1024 * 1024) { // 1MB limit
+                    this.showNotification('Arquivo muito grande. Limite: 1MB', 'error');
+                    return;
+                }
+                
+                this.fileName = file.name;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.fileContent = e.target.result;
+                    this.updateDropZone();
+                    this.showNotification(`Arquivo "${this.fileName}" anexado!`, 'success');
+                };
+                reader.readAsText(file);
+            }
+
+            updateDropZone() {
+                if (this.fileName) {
+                    this.elements.dropZone.innerHTML = `
+                        <i class="fas fa-file-alt"></i>
+                        <span>Arquivo anexado: <strong>${this.fileName}</strong></span>
+                        <small style="display: block; margin-top: 5px; opacity: 0.7;">Clique para trocar o arquivo</small>
+                    `;
+                } else {
+                    this.elements.dropZone.innerHTML = `
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Arraste arquivos aqui ou clique para selecionar</span>
+                    `;
+                }
+            }
+
+            async sendMessage() {
+                const message = this.elements.messageInput.value.trim();
+                if (!message || this.isLoading) return;
+                
+                if (!this.apiKey) {
+                    this.showNotification('Por favor, configure sua API Key primeiro!', 'error');
+                    return;
+                }
+
+                this.isLoading = true;
+                this.updateUI(true);
+                
+                // Add user message
+                this.addMessage('user', message);
+                this.elements.messageInput.value = '';
+                this.elements.messageInput.style.height = 'auto';
+
+                try {
+                    const response = await this.callAPI(message);
+                    this.addMessage('bot', response.response);
+                    this.updateCostInfo(response.cost_info);
+                    
+                    // Clear file after use
+                    this.fileContent = '';
+                    this.fileName = '';
+                    this.updateDropZone();
+                    
+                } catch (error) {
+                    this.addMessage('bot', `❌ Erro: ${error.message}`);
+                    this.showNotification('Erro ao enviar mensagem', 'error');
+                } finally {
+                    this.isLoading = false;
+                    this.updateUI(false);
+                }
+            }
+
+            async callAPI(message) {
+                const maxTokens = parseInt(this.elements.maxTokens.value) || 1024;
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': this.apiKey
+                    },
+                    body: JSON.stringify({
+                        prompt: message,
+                        file_content: this.fileContent,
+                        max_tokens: maxTokens
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Erro desconhecido da API');
+                }
+
+                return await response.json();
+            }
+
+            addMessage(sender, content) {
+                // Remove welcome message if it exists
+                const welcome = this.elements.chatMessages.querySelector('.welcome-message');
+                if (welcome) {
+                    welcome.remove();
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${sender}`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.innerHTML = this.formatMessage(content);
+                
+                messageDiv.appendChild(contentDiv);
+                this.elements.chatMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
+            }
+
+            formatMessage(content) {
+                // Simple markdown-like formatting
+                return content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code style="background: var(--surface-light); padding: 2px 6px; border-radius: 4px;">$1</code>')
+                    .replace(/\n/g, '<br>');
+            }
+
+            updateUI(loading) {
+                this.elements.sendBtn.disabled = loading;
+                this.elements.loading.classList.toggle('show', loading);
+                
+                if (loading) {
+                    this.elements.sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                } else {
+                    this.elements.sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                }
+            }
+
+            updateCostInfo(costInfo) {
+                this.elements.costDisplay.textContent = `${costInfo.estimated_cost_usd}`;
+                this.elements.tokenDisplay.textContent = `${costInfo.input_tokens} → ${costInfo.output_tokens}`;
+            }
+
+            updateCharacterCount() {
+                const text = this.elements.messageInput.value;
+                const count = text.length;
+                const maxLength = 50000;
+                
+                this.elements.charCount.textContent = count.toLocaleString();
+                
+                const counter = this.elements.charCount.parentElement;
+                counter.classList.remove('warning', 'danger');
+                
+                if (count > maxLength * 0.9) {
+                    counter.classList.add('danger');
+                } else if (count > maxLength * 0.75) {
+                    counter.classList.add('warning');
+                }
+                
+                // Disable send button if over limit
+                if (count > maxLength) {
+                    this.elements.sendBtn.disabled = true;
+                    if (count === maxLength + 1) { // Show notification only once
+                        this.showNotification('Limite de caracteres atingido! Textos muito longos aumentam o custo e tempo de resposta.', 'error');
+                    }
+                } else {
+                    this.elements.sendBtn.disabled = this.isLoading;
+                }
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i>
+                    ${message}
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.classList.add('show'), 100);
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize the portal
+        document.addEventListener('DOMContentLoaded', () => {
+            new ClaudePortal();
+        });
+    </script>
+</body>
+</html>
