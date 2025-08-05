@@ -1,5 +1,4 @@
-# api/chat.py
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import anthropic
 import os
 import tiktoken  # Para contagem de tokens
@@ -18,6 +17,16 @@ def count_tokens(text):
     except Exception as e:
         print(f"Erro ao contar tokens: {e}")
         return len(text.split()) * 2 # Estimativa simples em caso de erro
+
+# Rota para a página inicial (index.html)
+@app.route('/')
+def home():
+    return send_from_directory('static', 'index.html')
+
+# Rota para servir os arquivos estáticos (como script.js)
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
