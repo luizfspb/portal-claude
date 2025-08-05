@@ -1,0 +1,14 @@
+[33m0b50f5a[m[33m ([m[1;31morigin/main[m[33m)[m feat: adiciona branding e links para GitHub
+[33ma449ae0[m fix: corrige erro 404 na página inicial
+[33mbe49907[m fix: corrige deploy na Vercel e adiciona LICENSE
+[33m15a1877[m feat: adiciona suporte completo para projetos .NET MAUI
+[33m85bdd96[m feat: redesign completo da interface do Portal Claude
+[33m734b88f[m feat: Adiciona melhorias ao estilos CSS para o chat
+[33m547e509[m feat: Adiciona estilos CSS para o chat
+[33m1f7af90[m fix: corrige o path para arquivos estaticos no flask
+[33m809d810[m fix: move rotas estaticas para o flask
+[33m52eee3d[m fix: Ajusta rotas no vercel.json para resolver erro 404
+[33m5981749[m feat: Adiciona vercel.json para configuração de rotas
+[33me79cbeb[m Merge branch 'main' of https://github.com/luizfspb/portal-claude
+[33m0f72db5[m fix: Renomeia arquivos e adiciona vercel.json
+[33m3b75929[m feat: Adiciona portal de chat com a API do Claude
